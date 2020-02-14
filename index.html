@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algotimo A *</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script><body>
+    <script src="js/client.js"></script>
+    <header>
+        <h1>Algoritmo A*</h1>
+    </header>
+    <div class="container">
+        
+        <div class="board-section">
+            <div class="board-draw">
+                <h2 id="map-title">Mapa</h2>
+                <table id="board">
+        
+                </table>
+            </div>
+            <div class="create-board-menu">
+                <h3>Filas</h3>
+                <input type="number" id="rows-quantity" name="quantity" value="4">
+                <h3>Columnas</h3>
+                <input type="number" id="columns-quantity" name="quantity" value="4">
+                <button id="create-new-board">Crear</button>
+            </div>
+        </div>
+
+        <div class="options">
+            <button id="place_start_button">Colocar Inicio</button>
+            <button id="place_goal_button">Colocar meta</button>
+            <button id="place_barrier_button">Colocar barrera</button>
+            <button id="clear_cell_button">Vaciar Celda</button>
+            <button id="start">Empezar</button>
+        </div>
+    </div>
+    <footer>
+        <h4 id="footer-text">Desarollado por <strong>Manuel Monforte Escobar</strong></h4>
+        <p>Ingeniería del Conocimiento 2019-2020, Universidad Complutense de Madrid (UCM)</p>
+    </footer>
+</body>
+</html>

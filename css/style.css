@@ -1,0 +1,107 @@
+*{
+    margin:0;
+    padding: 0;
+}
+
+header{
+    background-color: #007bff;
+    text-align:center;
+    padding: 3%;
+    color:white;
+    font-size: 2em;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#map-title{
+    margin-top: 10%;
+}
+
+.board-section{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.board-draw {
+    margin-top: 2%;
+    text-align: center;
+}
+
+.create-board-menu{
+    margin-left: 20%;
+}
+
+tr,td{
+    border:2px solid grey;
+}
+
+.options{
+    display: flex;
+    border:2px solid lightgray;
+    padding: 3%;
+    margin-top: 3%;
+    min-width: 60%;
+    justify-content: center;
+}
+
+.options > button{
+    background-color: #007bff;
+    color: white;
+    padding: 3%;
+    border-radius: 5px;
+    margin : 1%;
+}
+
+#start{
+    background-color: green;
+}
+
+#create-new-board{
+    background-color: #007bff;
+    color: white;
+    padding: 5%;
+    border-radius: 5px;
+    margin : 3% auto;
+}
+
+.marked{
+    border: 5px solid black;
+}
+
+.start_cell{
+    background-color: red;
+}
+
+.goal_cell{
+    background-color: green;
+}
+
+.barrier_cell{
+    background-color: black;
+}
+
+footer{
+    background-color: #007bff;
+    text-align:center;
+    padding: 2%;
+    color:white;
+    font-size: 2em;
+    bottom:0;
+    width: 100%;
+    margin-top: 5%;
+}
+
+#footer-text{
+    font-size: 18px;
+}
+
+p{
+    font-size: 13px;
+}
