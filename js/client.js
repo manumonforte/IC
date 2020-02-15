@@ -4,6 +4,11 @@ const MAX_GOAL_CELL = 1;
 let start_cell_count = 0;
 let goal_cell_count = 0;
 
+
+let rows = 4;
+let columns = 4;
+let matrix = undefined;
+
 $(()=>{
 
     //Default Board
@@ -14,7 +19,7 @@ $(()=>{
         createBoard()
     });
 
-    //Get marked one button
+    /*GET SELECTED ONLY ONE BUTTON*/
     $('#place_barrier_button').on("click", () => {
         if ($('#place_start_button').hasClass('marked')) {
             $('#place_start_button').removeClass('marked')
@@ -68,7 +73,7 @@ $(()=>{
     })
 
 
-
+    /* SELECT ONE BUTTON TO DRAW IN BOARD*/
     $("table").mousedown(() => {
         IsClickDown = true;
         //logica para pintar celda
@@ -113,15 +118,14 @@ $(()=>{
         IsClickDown = false;
     })
 
-    
-
- 
+    /* START BUTTON*/
     $("#start").on("click",()=>{
         if(!start_cell_count || !goal_cell_count){
             alert("Falta celda de inicio o final");
         }
         else {
-
+            console.log("Pintando matriz");
+            boardtoMatrix()
         }
     })
 
@@ -141,8 +145,7 @@ function drawBoard(rows, columns){
         let newRow = $("<tr></tr>")
         for (let j = 0; j < columns; j++){
             let newCol = $("<td></td>");
-            newCol.addClass("i"+ i);
-            newCol.addClass("j"+ j);
+            newCol.attr("id","i"+ i + "_" + "j"+ j);
             newRow.append(newCol);
         }
         $("table").append(newRow)
@@ -163,11 +166,33 @@ function createBoard(){
         drawBoard($("#rows-quantity").val(), $("#columns-quantity").val());
         start_cell_count = 0;
         goal_cell_count = 0;
-        $("rows-quantity").val ="";
-        $("column-quantity").val="";
+        rows = $("rows-quantity").val();
+        columns = $("columns-quantity").val()        
     }
 }
 
 //TODO: Funcion para guardar tablero en una matriz
+/**
+ * Save the current board into the matrix
+ */
+function boardtoMatrix(){
+    matrix = []; 
+    for(let i = 0; i < rows; i++){
+        matrix[i] = [];
+        for(let j = 0; j < columns; j++){
+            //Start
+            if( $(`#i${i}_j${j}`).attr('class') === "start_cell") matrix[i][j] = "*";
+            //Goal
+            else if ($(`#i${i}_j${j}`).attr('class') === "goal_cell") matrix[i][j] = "#";
+            //Barrier
+            else if ($(`#i${i}_j${j}`).attr('class') === "barrier_cell") matrix[i][j] = "X";
+            //Empty
+            else matrix[i][j] = " ";
+        }
+    }
+}
 
 //TODO: Funcion para resolver A *
+/********************************************************* */
+/****************ALGORITHIM A STAR *********************** */
+/********************************************************* */
