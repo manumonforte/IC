@@ -4,7 +4,7 @@
 }
 
 header{
-    background-color: #007bff;
+    background-color: #1479e6;
     text-align:center;
     padding: 3%;
     color:white;
@@ -52,19 +52,38 @@ tr,td{
 }
 
 .options > button{
-    background-color: #007bff;
+    background-color: #1479e6;
     color: white;
     padding: 3%;
     border-radius: 5px;
     margin : 1%;
 }
 
+#place_start_button{
+    background-color: black;
+    color:white;
+}
+
+#place_goal_button{
+    background-color: rgb(14, 156, 14);
+}
+
+
+#place_barrier_button{
+    background-color: rgb(214, 42, 42);
+}
+
+#clear_cell_button{
+    background-color: rgb(238, 236, 231);
+    color: black;
+}
+
 #start{
-    background-color: green;
+    background-color: 1479e6;
 }
 
 #create-new-board{
-    background-color: #007bff;
+    background-color: #1479e6;
     color: white;
     padding: 5%;
     border-radius: 5px;
@@ -76,19 +95,20 @@ tr,td{
 }
 
 .start_cell{
-    background-color: red;
-}
-
-.goal_cell{
-    background-color: green;
-}
-
-.barrier_cell{
     background-color: black;
 }
 
+.goal_cell{
+    background-color: rgb(14, 156, 14);;
+}
+
+.barrier_cell{
+    background-color: rgb(214, 42, 42);
+}
+
+
 footer{
-    background-color: #007bff;
+    background-color: #1479e6;
     text-align:center;
     padding: 2%;
     color:white;
