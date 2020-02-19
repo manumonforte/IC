@@ -1,21 +1,24 @@
 const MAX_START_CELL = 1;
 const MAX_GOAL_CELL = 1;
 
-let start_cell_count = 0;
-let goal_cell_count = 0;
+var start_cell_count = 0;
+var goal_cell_count = 0;
 
 
-let rows = 4;
-let columns = 4;
-let matrix = undefined;
+var rows = 4;
+var columns = 4;
+var matrix = undefined;
 
-$(()=>{
+var startNode = undefined
+var goalNode = undefined
+
+$(() => {
 
     //Default Board
-    drawBoard(4,4)
+    drawBoard(4, 4)
 
     //Create new Board
-    $('#create-new-board').on("click", ()=> {
+    $('#create-new-board').on("click", () => {
         createBoard()
     });
 
@@ -68,7 +71,7 @@ $(()=>{
         }
         if ($('#place_start_button').hasClass('marked')) {
             $('#place_start_button').removeClass('marked')
-        }
+        } 
         $('#clear_cell_button').addClass("marked");
     })
 
@@ -77,40 +80,40 @@ $(()=>{
     $("table").mousedown(() => {
         IsClickDown = true;
         //logica para pintar celda
-        if($('#place_start_button').hasClass('marked') && start_cell_count < MAX_START_CELL){
+        if ($('#place_start_button').hasClass('marked') && start_cell_count < MAX_START_CELL) {
             //If the cell was goal update count
-            if($(event.target).hasClass('goal_cell')){
-                goal_cell_count  -=1;
+            if ($(event.target).hasClass('goal_cell')) {
+                goal_cell_count -= 1;
             }
             $(event.target).addClass("start_cell");
-            start_cell_count +=1;
-            
+            start_cell_count += 1;
+
         }
-        else if($('#place_goal_button').hasClass('marked') && goal_cell_count < MAX_GOAL_CELL){
+        else if ($('#place_goal_button').hasClass('marked') && goal_cell_count < MAX_GOAL_CELL) {
             //If the cell was start update count
-            if($(event.target).hasClass('start_cell')){
-                start_cell_count  -=1;
+            if ($(event.target).hasClass('start_cell')) {
+                start_cell_count -= 1;
             }
             $(event.target).addClass("goal_cell");
-            goal_cell_count  +=1;
+            goal_cell_count += 1;
         }
-        else if($('#place_barrier_button').hasClass('marked')){
+        else if ($('#place_barrier_button').hasClass('marked')) {
             //if the cell was start or goal update count
-            if($(event.target).hasClass('goal_cell')){
-                goal_cell_count  -=1;
+            if ($(event.target).hasClass('goal_cell')) {
+                goal_cell_count -= 1;
             }
-            else if($(event.target).hasClass('start_cell')){
-                start_cell_count  -=1;
+            else if ($(event.target).hasClass('start_cell')) {
+                start_cell_count -= 1;
             }
             $(event.target).addClass("barrier_cell");
         }
-        else if($('#clear_cell_button').hasClass('marked')){
+        else if ($('#clear_cell_button').hasClass('marked')) {
             //if the cell was start or goal update count
-            if($(event.target).hasClass('goal_cell')){
-                goal_cell_count  -=1;
+            if ($(event.target).hasClass('goal_cell')) {
+                goal_cell_count -= 1;
             }
-            else if($(event.target).hasClass('start_cell')){
-                start_cell_count  -=1;
+            else if ($(event.target).hasClass('start_cell')) {
+                start_cell_count -= 1;
             }
             $(event.target).removeClass();
         }
@@ -119,13 +122,18 @@ $(()=>{
     })
 
     /* START BUTTON*/
-    $("#start").on("click",()=>{
-        if(!start_cell_count || !goal_cell_count){
+    $("#start").on("click", () => {
+        if (!start_cell_count || !goal_cell_count) {
             alert("Falta celda de inicio o final");
         }
         else {
             console.log("Pintando matriz");
             boardtoMatrix()
+            let path = findTrip()
+
+            path.forEach(node => {
+
+            })
         }
     })
 
@@ -138,14 +146,14 @@ $(()=>{
  * @param {*} rows 
  * @param {*} columns 
  */
-function drawBoard(rows, columns){
+function drawBoard(rows, columns) {
     $("table").empty();
     //create cells
-    for (let i = 0; i < rows; i++){
+    for (let i = 0; i < rows; i++) {
         let newRow = $("<tr></tr>")
-        for (let j = 0; j < columns; j++){
+        for (let j = 0; j < columns; j++) {
             let newCol = $("<td></td>");
-            newCol.attr("id","i"+ i + "_" + "j"+ j);
+            newCol.attr("id", "i" + i + "_" + "j" + j);
             newRow.append(newCol);
         }
         $("table").append(newRow)
@@ -158,16 +166,16 @@ function drawBoard(rows, columns){
 /**
  * Creates new board when user press the button
  */
-function createBoard(){
-    if($("#rows-quantity").val() > 10 || $("#rows-quantity").val() < 2 || $("#columns-quantity").val() < 2 || $("#columns-quantity").val() > 10 ){
+function createBoard() {
+    if ($("#rows-quantity").val() > 10 || $("#rows-quantity").val() < 2 || $("#columns-quantity").val() < 2 || $("#columns-quantity").val() > 10) {
         alert("Las filas columnas deben estar comprendidas entre 2 y 10");
     }
-    else{
+    else {
         drawBoard($("#rows-quantity").val(), $("#columns-quantity").val());
         start_cell_count = 0;
         goal_cell_count = 0;
         rows = $("rows-quantity").val();
-        columns = $("columns-quantity").val()        
+        columns = $("columns-quantity").val()
     }
 }
 
@@ -175,19 +183,27 @@ function createBoard(){
 /**
  * Save the current board into the matrix
  */
-function boardtoMatrix(){
-    matrix = []; 
-    for(let i = 0; i < rows; i++){
+function boardtoMatrix() {
+    matrix = [];
+    for (let i = 0; i < rows; i++) {
         matrix[i] = [];
-        for(let j = 0; j < columns; j++){
+        for (let j = 0; j < columns; j++) {
             //Start
-            if( $(`#i${i}_j${j}`).attr('class') === "start_cell") matrix[i][j] = "*";
+            if ($(`#i${i}_j${j}`).attr('class') === "start_cell") {
+                startNode = { i, j, f: 0, g: 0, h: undefined, distance: 0, parent: undefined, representation: "*"};
+                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "*"};
+            }
             //Goal
-            else if ($(`#i${i}_j${j}`).attr('class') === "goal_cell") matrix[i][j] = "#";
+            else if ($(`#i${i}_j${j}`).attr('class') === "goal_cell") {
+                goalNode = { x: i, y: j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "#"};
+                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "*"};
+            }
             //Barrier
-            else if ($(`#i${i}_j${j}`).attr('class') === "barrier_cell") matrix[i][j] = "X";
+            else if ($(`#i${i}_j${j}`).attr('class') === "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "X"};
+
             //Empty
-            else matrix[i][j] = " ";
+            else 
+            matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: " "};
         }
     }
 }
@@ -196,3 +212,92 @@ function boardtoMatrix(){
 /********************************************************* */
 /****************ALGORITHIM A STAR *********************** */
 /********************************************************* */
+
+function findTrip() {
+    debugger;
+
+    let openList = [];
+    let closeList = [];
+    let trip = [];
+
+    openList.push(startNode);
+
+    //mientras la lista abierta no este vacia
+    //cogemos el minimo de los costes
+    while (openList.length > 0) {
+        let min = Infinity;
+        let nodeSelected = undefined;
+
+        //coger nodo con menor coste
+        openList.forEach(node => {
+            if (node.f < min) {
+                min = node.coste;
+                nodeSelected = node;
+            }
+        })
+
+        //si  hemos llegado
+        if(compareNodes(nodeSelected,goalNode)){
+            goalNode.parent = nodeSelected;
+            //recostruimos y volvemos el camino
+        }
+        else {
+            //metemos en lista cerrada
+            closeList.push(nodeSelected);
+            //eliminamos de aierta
+            openList.splice(openList.indexOf(nodeSelected), 1);
+            //expandimos el nodo seleccionado calculando costes y poniendolo en abierta
+
+            //cogemos vecinos
+            neighboursList = getNeighbours(nodeSelected);
+            neighboursList.forEach(neighbour => {
+                //actualizo distancias y lo meto en la lista abierta
+                if(!closeList.indexOf(neighbour) || !neighbour.representation== "X"){
+                    neighbour.g= g(neighbour);
+                    neighbour.h= h(neighbour);
+                    neighbour.f =  neighbour.g + neighbour.h;
+                    neighbour.parent = nodeSelected;
+                    openList.push(neighbour);
+                }
+            })
+
+        }
+    }
+
+
+
+
+    return trip;
+
+}
+
+function g(startNode, actualNode) {
+    return
+}
+
+function h(goalNode, actualNode) {
+
+}
+
+function compareNodes(a, b) {
+    return (a.i == b.i && a.j == b.j);
+}
+
+function getNeighbours(node){
+    let x = node.i;
+    let y = node.j;
+    
+    neighbours = [];
+
+    if(matrix[x-1][y-1]) neighbours.push(matrix[x-1][y-1]);
+    if(matrix[x][y-1]) neighbours.push(matrix[x][y-1]);
+    if(matrix[x+1][y-1]) neighbours.push(matrix[x+1][y-1]);
+    if(matrix[x-1][y]) neighbours.push(matrix[x-1][y]);
+    if(matrix[x+1][y]) neighbours.push(matrix[x+1][y]);
+    if(matrix[x-1][y+1]) neighbours.push(matrix[x-1][y+1]);
+    if(matrix[x][y+1]) neighbours.push(matrix[x][y+1]);
+    if(matrix[x+1][y+1]) neighbours.push(matrix[x+1][y+1]);
+
+    return neighbours;
+
+}
