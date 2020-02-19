@@ -71,7 +71,7 @@ $(() => {
         }
         if ($('#place_start_button').hasClass('marked')) {
             $('#place_start_button').removeClass('marked')
-        } 
+        }
         $('#clear_cell_button').addClass("marked");
     })
 
@@ -190,20 +190,22 @@ function boardtoMatrix() {
         for (let j = 0; j < columns; j++) {
             //Start
             if ($(`#i${i}_j${j}`).attr('class') === "start_cell") {
-                startNode = { i, j, f: 0, g: 0, h: undefined, distance: 0, parent: undefined, representation: "*"};
-                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "*"};
+                startNode = { i, j, f: 0, g: 0, h: undefined, distance: 0, parent: undefined, representation: "*" };
+                startNode.h = h(startNode);
+                startNode.f = startNode.h;
+                matrix[i][j] = startNode;
             }
             //Goal
             else if ($(`#i${i}_j${j}`).attr('class') === "goal_cell") {
-                goalNode = { x: i, y: j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "#"};
-                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "*"};
+                goalNode = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "#" };
+                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "*" };
             }
             //Barrier
-            else if ($(`#i${i}_j${j}`).attr('class') === "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "X"};
+            else if ($(`#i${i}_j${j}`).attr('class') === "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "X" };
 
             //Empty
-            else 
-            matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: " "};
+            else
+                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: " " };
         }
     }
 }
@@ -237,7 +239,7 @@ function findTrip() {
         })
 
         //si  hemos llegado
-        if(compareNodes(nodeSelected,goalNode)){
+        if (compareNodes(nodeSelected, goalNode)) {
             goalNode.parent = nodeSelected;
             //recostruimos y volvemos el camino
         }
@@ -251,12 +253,12 @@ function findTrip() {
             //cogemos vecinos
             neighboursList = getNeighbours(nodeSelected);
             neighboursList.forEach(neighbour => {
-                //actualizo distancias y lo meto en la lista abierta
-                if(!closeList.indexOf(neighbour) || !neighbour.representation== "X"){
-                    neighbour.g= g(neighbour);
-                    neighbour.h= h(neighbour);
-                    neighbour.f =  neighbour.g + neighbour.h;
-                    neighbour.parent = nodeSelected;
+                neighbour.parent = nodeSelected;
+                //sino esta en cerrada y no es una barrera actualizo distancias y lo meto en la lista abierta
+                if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X") {
+                    neighbour.g = neighbour.parent.g + 1;
+                    neighbour.h = h(neighbour);
+                    neighbour.f = neighbour.g + neighbour.h;
                     openList.push(neighbour);
                 }
             })
@@ -275,28 +277,27 @@ function g(startNode, actualNode) {
     return
 }
 
-function h(goalNode, actualNode) {
-
+function h(actualNode) {
+    return Math.sqrt(Math.pow((goalNode.i - actualNode.i), 2) + Math.pow((goalNode.j - actualNode.j), 2));
 }
 
 function compareNodes(a, b) {
     return (a.i == b.i && a.j == b.j);
 }
 
-function getNeighbours(node){
+function getNeighbours(node) {
     let x = node.i;
     let y = node.j;
-    
-    neighbours = [];
 
-    if(matrix[x-1][y-1]) neighbours.push(matrix[x-1][y-1]);
-    if(matrix[x][y-1]) neighbours.push(matrix[x][y-1]);
-    if(matrix[x+1][y-1]) neighbours.push(matrix[x+1][y-1]);
-    if(matrix[x-1][y]) neighbours.push(matrix[x-1][y]);
-    if(matrix[x+1][y]) neighbours.push(matrix[x+1][y]);
-    if(matrix[x-1][y+1]) neighbours.push(matrix[x-1][y+1]);
-    if(matrix[x][y+1]) neighbours.push(matrix[x][y+1]);
-    if(matrix[x+1][y+1]) neighbours.push(matrix[x+1][y+1]);
+    neighbours = [];
+    if (x - 1 >= 0 && y - 1 >= 0) neighbours.push(matrix[x - 1][y - 1]);
+    if (y - 1 >= 0) neighbours.push(matrix[x][y - 1]);
+    if (x + 1 < matrix.length && y - 1 >= 0) neighbours.push(matrix[x + 1][y - 1]);
+    if (x - 1 >= 0) neighbours.push(matrix[x - 1][y]);
+    if (x + 1 < matrix[0].length) neighbours.push(matrix[x + 1][y]);
+    if (x - 1 >= 0 && y + 1 < matrix[0].length) neighbours.push(matrix[x - 1][y + 1]);
+    if (y + 1 < matrix[0].length) neighbours.push(matrix[x][y + 1]);
+    if (x + 1 < matrix.length && y + 1 < matrix[0].length) neighbours.push(matrix[x + 1][y + 1]);
 
     return neighbours;
 
