@@ -79,7 +79,7 @@ tr,td{
 }
 
 #start{
-    background-color: 1479e6;
+    background-color: #1479e6;
 }
 
 #create-new-board{
@@ -99,7 +99,7 @@ tr,td{
 }
 
 .goal_cell{
-    background-color: rgb(14, 156, 14);;
+    background-color: rgb(14, 156, 14);
 }
 
 .barrier_cell{
@@ -124,4 +124,8 @@ footer{
 
 p{
     font-size: 13px;
+}
+
+.path{
+    background-color: lightblue;
 }

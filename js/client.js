@@ -1,16 +1,18 @@
 const MAX_START_CELL = 1;
 const MAX_GOAL_CELL = 1;
 
-var start_cell_count = 0;
-var goal_cell_count = 0;
+let start_cell_count = 0;
+let goal_cell_count = 0;
 
 
-var rows = 4;
-var columns = 4;
-var matrix = undefined;
+let rows = 4;
+let columns = 4;
+let matrix = undefined;
 
-var startNode = undefined
-var goalNode = undefined
+let startNode = undefined
+let goalNode = undefined
+
+let caminoEncontrado = false;
 
 $(() => {
 
@@ -22,6 +24,8 @@ $(() => {
         createBoard()
     });
 
+
+    //TODO: CREAR FUNCION CLEARBUTTONS Y AÑADIMOS MARKED AL QUE PULSAMOS
     /*GET SELECTED ONLY ONE BUTTON*/
     $('#place_barrier_button').on("click", () => {
         if ($('#place_start_button').hasClass('marked')) {
@@ -84,6 +88,11 @@ $(() => {
             //If the cell was goal update count
             if ($(event.target).hasClass('goal_cell')) {
                 goal_cell_count -= 1;
+                $(event.target).remove('goal_cell')
+            }
+            else if ($(event.target).hasClass('path')) {
+                $(event.target).remove('path')
+                $(event.target).css("background-color", "black"); 
             }
             $(event.target).addClass("start_cell");
             start_cell_count += 1;
@@ -93,6 +102,11 @@ $(() => {
             //If the cell was start update count
             if ($(event.target).hasClass('start_cell')) {
                 start_cell_count -= 1;
+                $(event.target).removeClass('start_cell')
+            }
+            else if ($(event.target).hasClass('path')) {
+                $(event.target).removeClass('path')
+                $(event.target).css("background-color", "rgb(14, 156, 14)"); 
             }
             $(event.target).addClass("goal_cell");
             goal_cell_count += 1;
@@ -101,9 +115,14 @@ $(() => {
             //if the cell was start or goal update count
             if ($(event.target).hasClass('goal_cell')) {
                 goal_cell_count -= 1;
+                $(event.target).removeClass('goal_cell')
             }
             else if ($(event.target).hasClass('start_cell')) {
                 start_cell_count -= 1;
+            }
+            else if ($(event.target).hasClass('path')) {
+                $(event.target).removeClass('path')
+                $(event.target).css("background-color", "rgb(214, 42, 42)"); 
             }
             $(event.target).addClass("barrier_cell");
         }
@@ -111,13 +130,18 @@ $(() => {
             //if the cell was start or goal update count
             if ($(event.target).hasClass('goal_cell')) {
                 goal_cell_count -= 1;
+                $(event.target).removeClass('goal_cell')
             }
             else if ($(event.target).hasClass('start_cell')) {
                 start_cell_count -= 1;
+                $(event.target).removeClass('start_cell')
             }
-            $(event.target).removeClass();
+            else if ($(event.target).hasClass('path')) {
+                $(event.target).removeClass('path')
+                $(event.target).css("background-color", "white"); 
+            }
         }
-
+        event.preventDefault();
         IsClickDown = false;
     })
 
@@ -127,13 +151,12 @@ $(() => {
             alert("Falta celda de inicio o final");
         }
         else {
-            console.log("Pintando matriz");
-            boardtoMatrix()
+            clearPath();
+            boardtoMatrix();
             let path = findTrip()
-
-            path.forEach(node => {
-
-            })
+            if (!path.length) alert("No hay solución");
+            else drawPath(path);
+            console.log(path);
         }
     })
 
@@ -174,131 +197,174 @@ function createBoard() {
         drawBoard($("#rows-quantity").val(), $("#columns-quantity").val());
         start_cell_count = 0;
         goal_cell_count = 0;
-        rows = $("rows-quantity").val();
-        columns = $("columns-quantity").val()
+        rows = $("#rows-quantity").val();
+        columns = $("#columns-quantity").val()
     }
 }
 
-//TODO: Funcion para guardar tablero en una matriz
 /**
  * Save the current board into the matrix
  */
 function boardtoMatrix() {
+    caminoEncontrado = false;
     matrix = [];
     for (let i = 0; i < rows; i++) {
         matrix[i] = [];
         for (let j = 0; j < columns; j++) {
             //Start
-            if ($(`#i${i}_j${j}`).attr('class') === "start_cell") {
+            if ($(`#i${i}_j${j}`).attr('class') == "start_cell") {
                 startNode = { i, j, f: 0, g: 0, h: undefined, distance: 0, parent: undefined, representation: "*" };
-                startNode.h = h(startNode);
-                startNode.f = startNode.h;
                 matrix[i][j] = startNode;
             }
             //Goal
-            else if ($(`#i${i}_j${j}`).attr('class') === "goal_cell") {
+            else if ($(`#i${i}_j${j}`).attr('class') == "goal_cell") {
                 goalNode = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "#" };
-                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "*" };
+                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "#" };
             }
             //Barrier
-            else if ($(`#i${i}_j${j}`).attr('class') === "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "X" };
+            else if ($(`#i${i}_j${j}`).attr('class') == "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "X" };
 
             //Empty
             else
                 matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: " " };
         }
     }
+
+    startNode.h = h(startNode);
+    startNode.f = startNode.h;
+
 }
 
-//TODO: Funcion para resolver A *
+
 /********************************************************* */
 /****************ALGORITHIM A STAR *********************** */
 /********************************************************* */
 
 function findTrip() {
-    debugger;
-
     let openList = [];
     let closeList = [];
     let trip = [];
 
     openList.push(startNode);
 
-    //mientras la lista abierta no este vacia
-    //cogemos el minimo de los costes
-    while (openList.length > 0) {
+    //while the open list isn't empty and we don't find the end
+    while (openList.length > 0 && !caminoEncontrado) {
         let min = Infinity;
         let nodeSelected = undefined;
 
-        //coger nodo con menor coste
+        //get node with less f
         openList.forEach(node => {
             if (node.f < min) {
-                min = node.coste;
+                min = node.f;
                 nodeSelected = node;
             }
         })
-
-        //si  hemos llegado
+        //if the less node is goalNode
         if (compareNodes(nodeSelected, goalNode)) {
-            goalNode.parent = nodeSelected;
-            //recostruimos y volvemos el camino
-        }
-        else {
-            //metemos en lista cerrada
-            closeList.push(nodeSelected);
-            //eliminamos de aierta
-            openList.splice(openList.indexOf(nodeSelected), 1);
-            //expandimos el nodo seleccionado calculando costes y poniendolo en abierta
+            goalNode.parent = nodeSelected.parent;
+            caminoEncontrado = true;
+            //create solution(path) and return it
+            while (nodeSelected.parent != undefined) {
+                trip.push(nodeSelected);
+                nodeSelected = nodeSelected.parent;
+            }
+            trip.push(startNode);
 
-            //cogemos vecinos
+        }
+        else {//put the less node isn't the goal
+            //put it in the close list
+            closeList.push(nodeSelected);
+            //remove it from the open list
+            openList.splice(openList.indexOf(nodeSelected), 1);
+            //expand node
+
+            //search Neighbours
             neighboursList = getNeighbours(nodeSelected);
             neighboursList.forEach(neighbour => {
-                neighbour.parent = nodeSelected;
-                //sino esta en cerrada y no es una barrera actualizo distancias y lo meto en la lista abierta
-                if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X") {
+                //if the neighbour doesn't appear in close, open list and the node is not a barrier or the start
+                if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X" && openList.indexOf(neighbour) == -1 && neighbour.representation != "*") {
+                    neighbour.parent = nodeSelected;
                     neighbour.g = neighbour.parent.g + 1;
                     neighbour.h = h(neighbour);
                     neighbour.f = neighbour.g + neighbour.h;
                     openList.push(neighbour);
                 }
+                //if the neighbour doesn't appear in close, and appears open list
+                else if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X" && openList.indexOf(neighbour) != -1 && neighbour.representation != "*") {
+                    //calculate new F
+                    gAux = (nodeSelected.i != neighbour.i && nodeSelected.j != nodeSelected.j) ? (nodeSelected.g + Math.sqrt(2)) : (nodeSelected.g + 1);
+                    hAux = h(neighbour);
+                    fAux = gAux + hAux;
+                    //update F
+                    if (fAux < neighbour.f) {
+                        neighbour.f = fAux;
+                        neighbour.h = hAux;
+                        neighbour.g = gAux;
+                        neighbour.parent = nodeSelected;
+                    }
+
+                }
             })
 
         }
     }
-
-
-
-
     return trip;
-
 }
 
-function g(startNode, actualNode) {
-    return
-}
-
+/**
+ * Returns the heuristic distance between node gicen and the goalNode
+ * @param {*} actualNode 
+ */
 function h(actualNode) {
     return Math.sqrt(Math.pow((goalNode.i - actualNode.i), 2) + Math.pow((goalNode.j - actualNode.j), 2));
 }
 
+/**
+ * Two nodes are equal if their corrdinates are the same
+ * @param {*} a 
+ * @param {*} b 
+ */
 function compareNodes(a, b) {
     return (a.i == b.i && a.j == b.j);
 }
 
+/**
+ * Get Neighbours given a node
+ * @param {*} node 
+ */
 function getNeighbours(node) {
     let x = node.i;
     let y = node.j;
-
     neighbours = [];
     if (x - 1 >= 0 && y - 1 >= 0) neighbours.push(matrix[x - 1][y - 1]);
     if (y - 1 >= 0) neighbours.push(matrix[x][y - 1]);
     if (x + 1 < matrix.length && y - 1 >= 0) neighbours.push(matrix[x + 1][y - 1]);
     if (x - 1 >= 0) neighbours.push(matrix[x - 1][y]);
-    if (x + 1 < matrix[0].length) neighbours.push(matrix[x + 1][y]);
+    if (x + 1 < matrix.length) neighbours.push(matrix[x + 1][y]);
     if (x - 1 >= 0 && y + 1 < matrix[0].length) neighbours.push(matrix[x - 1][y + 1]);
     if (y + 1 < matrix[0].length) neighbours.push(matrix[x][y + 1]);
     if (x + 1 < matrix.length && y + 1 < matrix[0].length) neighbours.push(matrix[x + 1][y + 1]);
 
     return neighbours;
 
+}
+
+function drawPath(path) {
+    path.forEach(elem => {
+        if (!$(`#i${elem.i}_j${elem.j}`).hasClass("start_cell") && !$(`#i${elem.i}_j${elem.j}`).hasClass("goal_cell")) {
+            $(`#i${elem.i}_j${elem.j}`).addClass("path");
+            $(`#i${elem.i}_j${elem.j}`).delay(1000);
+        }
+    })
+}
+
+function clearPath(){
+    if(matrix != undefined){
+    for (let i = 0; i < rows; i++) {
+            matrix[i] = [];
+            for (let j = 0; j < columns; j++) {
+                if ($(`#i${i}_j${j}`).attr('class') === "path") $(`#i${i}_j${j}`).removeClass("path");
+            }
+        }
+    }
 }
