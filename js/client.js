@@ -81,22 +81,21 @@ $(() => {
 
 
     /* SELECT ONE BUTTON TO DRAW IN BOARD*/
-    $("table").mousedown(() => {
-        IsClickDown = true;
+    $(document).on("click","td",() => {
         //logica para pintar celda
+        console.log(start_cell_count);
         if ($('#place_start_button').hasClass('marked') && start_cell_count < MAX_START_CELL) {
             //If the cell was goal update count
             if ($(event.target).hasClass('goal_cell')) {
                 goal_cell_count -= 1;
-                $(event.target).remove('goal_cell')
+                $(event.target).removeClass();
             }
             else if ($(event.target).hasClass('path')) {
-                $(event.target).remove('path')
+                $(event.target).removeClass()
                 $(event.target).css("background-color", "black"); 
             }
             $(event.target).addClass("start_cell");
             start_cell_count += 1;
-
         }
         else if ($('#place_goal_button').hasClass('marked') && goal_cell_count < MAX_GOAL_CELL) {
             //If the cell was start update count
@@ -105,8 +104,11 @@ $(() => {
                 $(event.target).removeClass('start_cell')
             }
             else if ($(event.target).hasClass('path')) {
-                $(event.target).removeClass('path')
+                $(event.target).removeClass()
                 $(event.target).css("background-color", "rgb(14, 156, 14)"); 
+            }
+            else if ($(event.target).hasClass('barrier_cell')) {
+                $(event.target).removeClass()
             }
             $(event.target).addClass("goal_cell");
             goal_cell_count += 1;
@@ -115,13 +117,13 @@ $(() => {
             //if the cell was start or goal update count
             if ($(event.target).hasClass('goal_cell')) {
                 goal_cell_count -= 1;
-                $(event.target).removeClass('goal_cell')
+                $(event.target).removeClass()
             }
             else if ($(event.target).hasClass('start_cell')) {
                 start_cell_count -= 1;
             }
             else if ($(event.target).hasClass('path')) {
-                $(event.target).removeClass('path')
+                $(event.target).removeClass()
                 $(event.target).css("background-color", "rgb(214, 42, 42)"); 
             }
             $(event.target).addClass("barrier_cell");
@@ -130,19 +132,21 @@ $(() => {
             //if the cell was start or goal update count
             if ($(event.target).hasClass('goal_cell')) {
                 goal_cell_count -= 1;
-                $(event.target).removeClass('goal_cell')
+                $(event.target).removeClass()
             }
             else if ($(event.target).hasClass('start_cell')) {
                 start_cell_count -= 1;
-                $(event.target).removeClass('start_cell')
+                $(event.target).removeClass()
+            }
+            else if ($(event.target).hasClass('barrier_cell')) {
+                $(event.target).removeClass()
             }
             else if ($(event.target).hasClass('path')) {
-                $(event.target).removeClass('path')
+                $(event.target).removeClass()
                 $(event.target).css("background-color", "white"); 
             }
         }
         event.preventDefault();
-        IsClickDown = false;
     })
 
     /* START BUTTON*/
@@ -350,11 +354,9 @@ function getNeighbours(node) {
 }
 
 function drawPath(path) {
-    path.forEach(elem => {
-        if (!$(`#i${elem.i}_j${elem.j}`).hasClass("start_cell") && !$(`#i${elem.i}_j${elem.j}`).hasClass("goal_cell")) {
-            $(`#i${elem.i}_j${elem.j}`).addClass("path");
-            $(`#i${elem.i}_j${elem.j}`).delay(1000);
-        }
+    path.forEach(elem => {         
+           if (!$(`#i${elem.i}_j${elem.j}`).hasClass("start_cell") && !$(`#i${elem.i}_j${elem.j}`).hasClass("goal_cell")) $(`#i${elem.i}_j${elem.j}`).addClass("path");
+            
     })
 }
 
