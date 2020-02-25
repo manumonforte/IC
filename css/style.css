@@ -78,6 +78,12 @@ tr,td{
     color: black;
 }
 
+#dangerous_cell_button{
+    background-color: rgb(212, 175, 7);
+    color: white;
+}
+
+
 #start{
     background-color: #1479e6;
 }
@@ -106,6 +112,9 @@ tr,td{
     background-color: rgb(214, 42, 42);
 }
 
+.dangerous_cell{
+    background-color: rgb(212, 175, 7);
+}
 
 footer{
     background-color: #1479e6;

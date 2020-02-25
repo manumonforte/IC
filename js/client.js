@@ -37,6 +37,9 @@ $(() => {
         if ($('#clear_cell_button').hasClass('marked')) {
             $('#clear_cell_button').removeClass('marked')
         }
+        if ($('#dangerous_cell_button').hasClass('marked')) {
+            $('#dangerous_cell_button').removeClass('marked')
+        }
         $('#place_barrier_button').addClass("marked");
     })
 
@@ -49,6 +52,9 @@ $(() => {
         }
         if ($('#clear_cell_button').hasClass('marked')) {
             $('#clear_cell_button').removeClass('marked')
+        }
+        if ($('#dangerous_cell_button').hasClass('marked')) {
+            $('#dangerous_cell_button').removeClass('marked')
         }
         $('#place_goal_button').addClass("marked");
     })
@@ -63,6 +69,9 @@ $(() => {
         if ($('#clear_cell_button').hasClass('marked')) {
             $('#clear_cell_button').removeClass('marked')
         }
+        if ($('#dangerous_cell_button').hasClass('marked')) {
+            $('#dangerous_cell_button').removeClass('marked')
+        }
         $('#place_start_button').addClass("marked");
     })
 
@@ -76,7 +85,26 @@ $(() => {
         if ($('#place_start_button').hasClass('marked')) {
             $('#place_start_button').removeClass('marked')
         }
+        if ($('#dangerous_cell_button').hasClass('marked')) {
+            $('#dangerous_cell_button').removeClass('marked')
+        }
         $('#clear_cell_button').addClass("marked");
+    })
+
+    $('#dangerous_cell_button').on("click", () => {
+        if ($('#place_barrier_button').hasClass('marked')) {
+            $('#place_barrier_button').removeClass('marked')
+        }
+        if ($('#place_goal_button').hasClass('marked')) {
+            $('#place_goal_button').removeClass('marked')
+        }
+        if ($('#place_start_button').hasClass('marked')) {
+            $('#place_start_button').removeClass('marked')
+        }
+        if ($('#clear_cell_button').hasClass('marked')) {
+            $('#clear_cell_button').removeClass('marked')
+        }
+        $('#dangerous_cell_button').addClass("marked");
     })
 
 
@@ -92,7 +120,6 @@ $(() => {
             }
             else if ($(event.target).hasClass('path')) {
                 $(event.target).removeClass()
-                $(event.target).css("background-color", "black"); 
             }
             $(event.target).addClass("start_cell");
             start_cell_count += 1;
@@ -105,7 +132,6 @@ $(() => {
             }
             else if ($(event.target).hasClass('path')) {
                 $(event.target).removeClass()
-                $(event.target).css("background-color", "rgb(14, 156, 14)"); 
             }
             else if ($(event.target).hasClass('barrier_cell')) {
                 $(event.target).removeClass()
@@ -121,10 +147,10 @@ $(() => {
             }
             else if ($(event.target).hasClass('start_cell')) {
                 start_cell_count -= 1;
+                $(event.target).removeClass()
             }
             else if ($(event.target).hasClass('path')) {
                 $(event.target).removeClass()
-                $(event.target).css("background-color", "rgb(214, 42, 42)"); 
             }
             $(event.target).addClass("barrier_cell");
         }
@@ -143,9 +169,27 @@ $(() => {
             }
             else if ($(event.target).hasClass('path')) {
                 $(event.target).removeClass()
-                $(event.target).css("background-color", "white"); 
             }
         }
+        else if ($('#dangerous_cell_button').hasClass('marked')) {
+            //if the cell was start or goal update count
+            if ($(event.target).hasClass('goal_cell')) {
+                goal_cell_count -= 1;
+                $(event.target).removeClass()
+            }
+            else if ($(event.target).hasClass('start_cell')) {
+                start_cell_count -= 1;
+                $(event.target).removeClass()
+            }
+            else if ($(event.target).hasClass('path')) {
+                $(event.target).removeClass()
+            }
+            else if ($(event.target).hasClass('barrier_cell')) {
+                $(event.target).removeClass()
+            }
+            $(event.target).addClass("dangerous_cell");
+        }
+        
         event.preventDefault();
     })
 
@@ -217,20 +261,23 @@ function boardtoMatrix() {
         for (let j = 0; j < columns; j++) {
             //Start
             if ($(`#i${i}_j${j}`).attr('class') == "start_cell") {
-                startNode = { i, j, f: 0, g: 0, h: undefined, distance: 0, parent: undefined, representation: "*" };
+                startNode = { i, j, f: 0, g: 0, h: undefined, parent: undefined, dangerous: 0, representation: "*" };
                 matrix[i][j] = startNode;
             }
             //Goal
             else if ($(`#i${i}_j${j}`).attr('class') == "goal_cell") {
-                goalNode = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "#" };
-                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: 0, parent: undefined, representation: "#" };
+                goalNode = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, representation: "#" };
+                matrix[i][j] = goalNode;
             }
             //Barrier
-            else if ($(`#i${i}_j${j}`).attr('class') == "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: "X" };
+            else if ($(`#i${i}_j${j}`).attr('class') == "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, representation: "X" };
+
+            //Dangerous
+            else if ($(`#i${i}_j${j}`).attr('class') == "dangerous_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0.1, representation: "^" };
 
             //Empty
             else
-                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, distance: undefined, parent: undefined, representation: " " };
+                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, representation: " " };
         }
     }
 
@@ -288,9 +335,9 @@ function findTrip() {
                 //if the neighbour doesn't appear in close, open list and the node is not a barrier or the start
                 if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X" && openList.indexOf(neighbour) == -1 && neighbour.representation != "*") {
                     neighbour.parent = nodeSelected;
-                    neighbour.g = neighbour.parent.g + 1;
+                    neighbour.g = (nodeSelected.i != neighbour.i && nodeSelected.j != nodeSelected.j) ? (nodeSelected.g + Math.sqrt(2)) : (nodeSelected.g + 1);
                     neighbour.h = h(neighbour);
-                    neighbour.f = neighbour.g + neighbour.h;
+                    neighbour.f = neighbour.g + neighbour.h + neighbour.dangerous;
                     openList.push(neighbour);
                 }
                 //if the neighbour doesn't appear in close, and appears open list
@@ -298,7 +345,7 @@ function findTrip() {
                     //calculate new F
                     gAux = (nodeSelected.i != neighbour.i && nodeSelected.j != nodeSelected.j) ? (nodeSelected.g + Math.sqrt(2)) : (nodeSelected.g + 1);
                     hAux = h(neighbour);
-                    fAux = gAux + hAux;
+                    fAux = gAux + hAux + neighbour.dangerous;
                     //update F
                     if (fAux < neighbour.f) {
                         neighbour.f = fAux;
