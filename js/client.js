@@ -121,6 +121,12 @@ $(() => {
             else if ($(event.target).hasClass('path')) {
                 $(event.target).removeClass()
             }
+            else if ($(event.target).hasClass('dangerous_cell')) {
+                $(event.target).removeClass()
+            }
+            else if ($(event.target).hasClass('barrier_cell')) {
+                $(event.target).removeClass()
+            }
             $(event.target).addClass("start_cell");
             start_cell_count += 1;
         }
@@ -134,6 +140,9 @@ $(() => {
                 $(event.target).removeClass()
             }
             else if ($(event.target).hasClass('barrier_cell')) {
+                $(event.target).removeClass()
+            }
+            else if ($(event.target).hasClass('dangerous_cell')) {
                 $(event.target).removeClass()
             }
             $(event.target).addClass("goal_cell");
@@ -152,6 +161,9 @@ $(() => {
             else if ($(event.target).hasClass('path')) {
                 $(event.target).removeClass()
             }
+            else if ($(event.target).hasClass('dangerous_cell')) {
+                $(event.target).removeClass()
+            }
             $(event.target).addClass("barrier_cell");
         }
         else if ($('#clear_cell_button').hasClass('marked')) {
@@ -168,6 +180,9 @@ $(() => {
                 $(event.target).removeClass()
             }
             else if ($(event.target).hasClass('path')) {
+                $(event.target).removeClass()
+            }
+            else if ($(event.target).hasClass('dangerous_cell')) {
                 $(event.target).removeClass()
             }
         }
@@ -261,29 +276,34 @@ function boardtoMatrix() {
         for (let j = 0; j < columns; j++) {
             //Start
             if ($(`#i${i}_j${j}`).attr('class') == "start_cell") {
-                startNode = { i, j, f: 0, g: 0, h: undefined, parent: undefined, dangerous: 0, representation: "*" };
+                startNode = { i, j, f: 0, g: 0, h: undefined, parent: undefined, dangerous: 0, height: 5,  representation: "*" };
                 matrix[i][j] = startNode;
             }
             //Goal
             else if ($(`#i${i}_j${j}`).attr('class') == "goal_cell") {
-                goalNode = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, representation: "#" };
+                goalNode = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, height: 5, representation: "#" };
                 matrix[i][j] = goalNode;
             }
             //Barrier
-            else if ($(`#i${i}_j${j}`).attr('class') == "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, representation: "X" };
+            else if ($(`#i${i}_j${j}`).attr('class') == "barrier_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, height:" ", representation: "X" };
 
             //Dangerous
-            else if ($(`#i${i}_j${j}`).attr('class') == "dangerous_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0.1, representation: "^" };
+            else if ($(`#i${i}_j${j}`).attr('class') == "dangerous_cell") matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 1, height: Math.floor(Math.random() * 10) + 1, representation: "^" };
 
             //Empty
             else
-                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, representation: " " };
+                matrix[i][j] = { i, j, f: undefined, g: undefined, h: undefined, parent: undefined, dangerous: 0, height: Math.floor(Math.random() * 10) + 1, representation: " " };
         }
     }
 
     startNode.h = h(startNode);
     startNode.f = startNode.h;
-
+    
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < columns; j++) {
+            $(`#i${i}_j${j}`).html(`${matrix[i][j].height}`);
+        }
+    }
 }
 
 
@@ -333,7 +353,7 @@ function findTrip() {
             neighboursList = getNeighbours(nodeSelected);
             neighboursList.forEach(neighbour => {
                 //if the neighbour doesn't appear in close, open list and the node is not a barrier or the start
-                if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X" && openList.indexOf(neighbour) == -1 && neighbour.representation != "*") {
+                if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X" && openList.indexOf(neighbour) == -1 && neighbour.representation != "*" && nodeSelected.height + 5 > neighbour.height) {
                     neighbour.parent = nodeSelected;
                     neighbour.g = (nodeSelected.i != neighbour.i && nodeSelected.j != nodeSelected.j) ? (nodeSelected.g + Math.sqrt(2)) : (nodeSelected.g + 1);
                     neighbour.h = h(neighbour);
@@ -341,7 +361,7 @@ function findTrip() {
                     openList.push(neighbour);
                 }
                 //if the neighbour doesn't appear in close, and appears open list
-                else if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X" && openList.indexOf(neighbour) != -1 && neighbour.representation != "*") {
+                else if (closeList.indexOf(neighbour) == -1 && neighbour.representation != "X" && openList.indexOf(neighbour) != -1 && neighbour.representation != "*" & nodeSelected.height + 5 > neighbour.height) {
                     //calculate new F
                     gAux = (nodeSelected.i != neighbour.i && nodeSelected.j != nodeSelected.j) ? (nodeSelected.g + Math.sqrt(2)) : (nodeSelected.g + 1);
                     hAux = h(neighbour);
