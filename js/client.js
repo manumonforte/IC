@@ -111,7 +111,6 @@ $(() => {
     /* SELECT ONE BUTTON TO DRAW IN BOARD*/
     $(document).on("click","td",() => {
         //logica para pintar celda
-        console.log(start_cell_count);
         if ($('#place_start_button').hasClass('marked') && start_cell_count < MAX_START_CELL) {
             //If the cell was goal update count
             if ($(event.target).hasClass('goal_cell')) {
@@ -432,7 +431,7 @@ function clearPath(){
     for (let i = 0; i < rows; i++) {
             matrix[i] = [];
             for (let j = 0; j < columns; j++) {
-                if ($(`#i${i}_j${j}`).attr('class') === "path") $(`#i${i}_j${j}`).removeClass("path");
+                if ($(`#i${i}_j${j}`).hasClass('path')) $(`#i${i}_j${j}`).removeClass();
             }
         }
     }
