@@ -132,7 +132,6 @@ def get_merit(example_list, N, attribute_index):
                 elif values[i] == "no":
                     n[j] += 1
             r[j] = frecuency_values[j] / len(example_list)
-
     # get the merit
     merit = 0.00
     for i in range(0, len(frecuency)):
@@ -168,7 +167,7 @@ def id3(table):
     """ID3 Alogrithim"""
     # If the example list is empty, "return"; otherwise, continue.
     if not table.get_examples():
-        return
+        return print("[RESULTADO]: No hay ejemplos")
     # If all the examples in the example list are +, return "+"; otherwise follow
     if table.num_positive_examples() == table.num_examples():
         return print("[RESULTADO]: +")
@@ -233,19 +232,54 @@ def id3(table):
                 ":",
             )
             # create new table with exampes and attributes remaining
-            print("[TABLA]")
+            print("[SUBTABLA]")
             print("   Atributos: {}".format(attributes_remaining))
-            print("   Ejemplos: {}".format(examples_remaining[i]))
+            for j in range(0,len(examples_remaining[i])):
+                if j==0:
+                    print("   Ejemplos:  {}".format(examples_remaining[i][j]))
+                else:
+                    print("              {}".format(examples_remaining[i][j]))
             id3(Table(attributes_remaining, examples_remaining[i]))
 
 
 def main():
-    attribute_list = AttributeList()
-    examples_list = ExamplesList()
-    create_attribute_list_from_file(attribute_list, "AtributosTest.txt")
-    create_example_list_from_file(examples_list, "JuegoTest.txt")
-    table = Table(attribute_list.get_list(), examples_list.get_list())
-    id3(table)
+    x = None
+    print("#" * 45)
+    print("#        Bienvenido a la practica ID3       #")
+    print("#" *45)
+    while(True):
+        print("#" * 45)
+        print("¿Que ejemplo desea probar, seleccione un numero?")
+        print(" 1. Ejercicio de Ejemplo de la práctica")
+        print(" 2. Ejercicio trasparencia nº 18")
+        print(" 3. Ejercicio trasparencia nº 23")
+        print(" 4. Salir")
+        
+        try:
+            x = input("Introduza su eleccion:")
+            if int(x) < 0 or int(x) > 4: 
+                raise Exception("Opcion invalida, debe estar entre [0-4]")
+            else:
+                attribute_list = AttributeList()
+                examples_list = ExamplesList()
+                if int(x) == 4:
+                    return        
+                elif int(x) == 1: 
+                    create_attribute_list_from_file(attribute_list, "AtributosJuego.txt")
+                    create_example_list_from_file(examples_list, "Juego.txt")
+                elif int(x) == 2:
+                    create_attribute_list_from_file(attribute_list, "AtributosDiap18.txt")
+                    create_example_list_from_file(examples_list, "JuegoDiap18.txt")
+                elif int(x) == 3:
+                    create_attribute_list_from_file(attribute_list, "AtributosDiap23.txt")
+                    create_example_list_from_file(examples_list, "JuegoDiap23.txt")
+                table = Table(attribute_list.get_list(), examples_list.get_list())
+                id3(table)
+        except ValueError as e:
+            print("SU selección ha de ser un número entre [0-4]")
+        except Exception as e:
+            print(e)
+
 
 
 if __name__ == "__main__":

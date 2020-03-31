@@ -1,0 +1,1 @@
+moroso,antiguedad,ingresos,trabajo_fijo,conceder
