@@ -1,0 +1,39 @@
+[MERITOS]
+   Tamano: 0.4591479170272448 
+   Timbre: 0.5408520829727552 
+   Portero: 0.9182958340544896 
+El mejor atributo es Tamano con mérito 0.4591479170272448
+
+('Para el valor pequeno del atributo Tamano:',)
+[SUBTABLA]
+   Atributos: ['Timbre', 'Portero', 'Clase']
+   Ejemplos:  ['uno', 'no', 'si']
+              ['varios', 'si', 'no']
+              ['uno', 'si', 'si']
+[MERITOS]
+   Timbre: 0.0 
+   Portero: 0.6666666666666666 
+El mejor atributo es Timbre con mérito 0.0
+
+('Para el valor uno del atributo Timbre:',)
+[SUBTABLA]
+   Atributos: ['Portero', 'Clase']
+   Ejemplos:  ['no', 'si']
+              ['si', 'si']
+[RESULTADO]: +
+('Para el valor varios del atributo Timbre:',)
+[SUBTABLA]
+   Atributos: ['Portero', 'Clase']
+   Ejemplos:  ['si', 'no']
+[RESULTADO]: -
+('Para el valor mediano del atributo Tamano:',)
+[SUBTABLA]
+   Atributos: ['Timbre', 'Portero', 'Clase']
+   Ejemplos:  ['uno', 'no', 'si']
+[RESULTADO]: +
+('Para el valor grande del atributo Tamano:',)
+[SUBTABLA]
+   Atributos: ['Timbre', 'Portero', 'Clase']
+   Ejemplos:  ['varios', 'no', 'no']
+              ['uno', 'si', 'no']
+[RESULTADO]: -

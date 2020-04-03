@@ -1,0 +1,77 @@
+[MERITOS]
+   moroso: 0.965148445440323 
+   antiguedad: 0.8754887502163469 
+   ingresos: 0.6490224995673063 
+   trabajo_fijo: 0.965148445440323 
+El mejor atributo es ingresos con mérito 0.6490224995673063
+
+('Para el valor 600-1200 del atributo ingresos:',)
+[SUBTABLA]
+   Atributos: ['moroso', 'antiguedad', 'trabajo_fijo', 'conceder']
+   Ejemplos:  ['si', '>5', 'si', 'si']
+              ['no', '<1', 'si', 'no']
+              ['si', '1-5', 'si', 'no']
+              ['no', '>5', 'no', 'no']
+[MERITOS]
+   moroso: 0.5 
+   antiguedad: 0.5 
+   trabajo_fijo: 0.6887218755408672 
+El mejor atributo es moroso con mérito 0.5
+
+('Para el valor si del atributo moroso:',)
+[SUBTABLA]
+   Atributos: ['antiguedad', 'trabajo_fijo', 'conceder']
+   Ejemplos:  ['>5', 'si', 'si']
+              ['1-5', 'si', 'no']
+[MERITOS]
+   antiguedad: 0.0 
+   trabajo_fijo: 1.0 
+El mejor atributo es antiguedad con mérito 0.0
+
+('Para el valor >5 del atributo antiguedad:',)
+[SUBTABLA]
+   Atributos: ['trabajo_fijo', 'conceder']
+   Ejemplos:  ['si', 'si']
+[RESULTADO]: +
+('Para el valor 1-5 del atributo antiguedad:',)
+[SUBTABLA]
+   Atributos: ['trabajo_fijo', 'conceder']
+   Ejemplos:  ['si', 'no']
+[RESULTADO]: -
+('Para el valor no del atributo moroso:',)
+[SUBTABLA]
+   Atributos: ['antiguedad', 'trabajo_fijo', 'conceder']
+   Ejemplos:  ['<1', 'si', 'no']
+              ['>5', 'no', 'no']
+[RESULTADO]: -
+('Para el valor >1200 del atributo ingresos:',)
+[SUBTABLA]
+   Atributos: ['moroso', 'antiguedad', 'trabajo_fijo', 'conceder']
+   Ejemplos:  ['si', '1-5', 'si', 'no']
+              ['no', '>5', 'no', 'si']
+              ['no', '<1', 'si', 'si']
+              ['no', '1-5', 'si', 'si']
+[MERITOS]
+   moroso: 0.0 
+   antiguedad: 0.5 
+   trabajo_fijo: 0.6887218755408672 
+El mejor atributo es moroso con mérito 0.0
+
+('Para el valor si del atributo moroso:',)
+[SUBTABLA]
+   Atributos: ['antiguedad', 'trabajo_fijo', 'conceder']
+   Ejemplos:  ['1-5', 'si', 'no']
+[RESULTADO]: -
+('Para el valor no del atributo moroso:',)
+[SUBTABLA]
+   Atributos: ['antiguedad', 'trabajo_fijo', 'conceder']
+   Ejemplos:  ['>5', 'no', 'si']
+              ['<1', 'si', 'si']
+              ['1-5', 'si', 'si']
+[RESULTADO]: +
+('Para el valor <600 del atributo ingresos:',)
+[SUBTABLA]
+   Atributos: ['moroso', 'antiguedad', 'trabajo_fijo', 'conceder']
+   Ejemplos:  ['no', '<1', 'si', 'no']
+              ['no', '1-5', 'no', 'no']
+[RESULTADO]: -

@@ -2,6 +2,7 @@ import math
 import sys
 import copy
 import codecs
+import logging
 
 
 class AttributeList:
@@ -43,6 +44,20 @@ class ExamplesList:
             text += "\n"
         return text
 
+class Leave():
+    """Class to represent the leave of the tree"""
+    def __init__(self, sol):
+        self.sol = sol
+
+class Node():
+    """class to represent the node of the tree"""
+
+    def __init__(self, name):
+        self.name = name
+        self.children = []
+
+    def newBranch(self, value, node):
+        self.children.append((value, node))
 
 class Table:
     """CLass to represent a table input for ID3 algorithim, it contains examples and attribute lists"""
@@ -167,16 +182,20 @@ def id3(table):
     """ID3 Alogrithim"""
     # If the example list is empty, "return"; otherwise, continue.
     if not table.get_examples():
-        return print("[RESULTADO]: No hay ejemplos")
+        logging.info("[RESULTADO]: No hay ejemplos")
+        return Leave("No hay ejemplos")
     # If all the examples in the example list are +, return "+"; otherwise follow
     if table.num_positive_examples() == table.num_examples():
-        return print("[RESULTADO]: +")
+        logging.info("[RESULTADO]: +")
+        return Leave("+")
     # If all the examples in the example list are -, return "-"; otherwise follow
     if table.num_negative_examples() == table.num_examples():
-        return print("[RESULTADO]: -")
+        logging.info("[RESULTADO]: -")
+        return Leave("-")
     # If attribute list is empty, return "error";
     if not table.get_attributes:
-        return print("[ERROR]: Lista de atributos vacía")
+        logging.info("[ERROR]: Lista de atributos vacía")
+        return Leave("no examples")
     else:
         # (1) call tbest_position an  item that minimizes merit
         merit_list = []
@@ -184,18 +203,15 @@ def id3(table):
             merit = get_merit(table.get_examples(), len(table.get_attributes()), x)
             merit_list.append(merit)
 
-        print("[MERITOS]")
+        logging.info("[MERITOS]")
         for i in range(len(merit_list)):
-            print("   {}: {} ".format(table.get_attributes()[i], merit_list[i]))
+            info = "   {}: {} ".format(table.get_attributes()[i], merit_list[i])
+            logging.info(info)
 
         best_position = merit_list.index(min(merit_list))
-        print(
-            "El mejor atributo es",
-            table.get_attributes()[best_position],
-            "con mérito",
-            min(merit_list),
-            "\n",
-        )
+        info = "El mejor atributo es " + table.get_attributes()[best_position] + " con mérito " + str(min(merit_list)) + "\n"
+        logging.info(info)
+        node = Node(table.get_attributes()[best_position])
         # start a tree whose root is better:
         # for every value vi better
         examples_remaining = []
@@ -224,26 +240,53 @@ def id3(table):
 
         ##recursive call
         for i in range(len(examples_remaining)):
-            print(
-                "Para el valor",
-                best_list[i],
-                "del atributo",
-                table.get_attributes()[best_position],
-                ":",
-            )
+            info = "Para el valor "+ best_list[i] + " del atributo " + table.get_attributes()[best_position] + ":",
+            logging.info(info)
             # create new table with exampes and attributes remaining
-            print("[SUBTABLA]")
-            print("   Atributos: {}".format(attributes_remaining))
+            logging.info("[SUBTABLA]")
+            logging.info("   Atributos: {}".format(attributes_remaining))
             for j in range(0,len(examples_remaining[i])):
                 if j==0:
-                    print("   Ejemplos:  {}".format(examples_remaining[i][j]))
+                    logging.info("   Ejemplos:  {}".format(examples_remaining[i][j]))
                 else:
-                    print("              {}".format(examples_remaining[i][j]))
-            id3(Table(attributes_remaining, examples_remaining[i]))
+                    logging.info("              {}".format(examples_remaining[i][j]))
+            node.newBranch(best_list[i],id3(Table(attributes_remaining, examples_remaining[i])))
+        return node
 
+def printTree(tree):
+    s = ''
+    if type(tree).__name__ == 'Node':
+        s += str(tree.name) + ' {'
+        for v, x in tree.children: s += str(v) + ':' + printTree(x) + ','
+        s += '} '
+    elif type(tree).__name__ == 'Leave':
+        s += "--> "+ tree.sol
+    return s
+
+def predict(example, tree):
+    if(len(example) == 0):
+        raise Exception("Valores introducidos erroneos")
+    if type(tree).__name__ == 'Node':
+        value = example[0]
+        new_tree = tree
+        for v,a in tree.children:
+            if v == value:
+                 new_tree = a
+        return predict(example[1:],new_tree)
+    elif type(tree).__name__ == 'Leave':
+        return tree.sol
+
+
+def generateTree(attribute_list,examples_list):
+    table = Table(attribute_list.get_list(), examples_list.get_list())
+    tree = id3(table)
+    print(printTree(tree))
+    return tree
 
 def main():
     x = None
+    filename = "logs/"
+
     print("#" * 45)
     print("#        Bienvenido a la practica ID3       #")
     print("#" *45)
@@ -267,16 +310,36 @@ def main():
                 elif int(x) == 1: 
                     create_attribute_list_from_file(attribute_list, "AtributosJuego.txt")
                     create_example_list_from_file(examples_list, "Juego.txt")
+                    filename="logs/Ejemplo_practica.log"
                 elif int(x) == 2:
                     create_attribute_list_from_file(attribute_list, "AtributosDiap18.txt")
                     create_example_list_from_file(examples_list, "JuegoDiap18.txt")
+                    filename="logs/Ejemplo_diapositiva_18.log"
+
                 elif int(x) == 3:
                     create_attribute_list_from_file(attribute_list, "AtributosDiap23.txt")
                     create_example_list_from_file(examples_list, "JuegoDiap23.txt")
-                table = Table(attribute_list.get_list(), examples_list.get_list())
-                id3(table)
+                    filename="logs/Ejemplo_diapositiva_23.log"
+
+                logging.basicConfig(filename=filename, filemode='w',format='%(asctime)s - %(message)s', level=logging.INFO)
+                #Remove the old logging handler
+                log = logging.getLogger()  # root logger
+                for hdlr in log.handlers[:]:  # remove all old handlers
+                    log.removeHandler(hdlr)
+                log.addHandler(logging.FileHandler(filename, 'w'))   
+
+                tree = generateTree(attribute_list,examples_list)
+
+                print("¿Desea predecir algun valor con el arbol creado?, si es así introduzca los valores separados por espacios")
+                example  = input().split(" ")
+                print(example)
+                if len(attribute_list.get_list()) - 1 != len(example):
+                    raise Exception("Valores incorrectos: <Valor1 Valor2 ...>")
+                else:
+                    sol = predict(example, tree)
+                    print("La respuesta es: {} ".format(sol))
         except ValueError as e:
-            print("SU selección ha de ser un número entre [0-4]")
+            print("Su selección ha de ser un número entre [0-4]")
         except Exception as e:
             print(e)
 

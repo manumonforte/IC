@@ -1,0 +1,69 @@
+[MERITOS]
+   TiempoExterior: 0.6935361388961918 
+   Temperatura: 0.9110633930116763 
+   Humedad: 0.7884504573082896 
+   Viento: 0.8921589282623617 
+El mejor atributo es TiempoExterior con mérito 0.6935361388961918
+
+('Para el valor soleado del atributo TiempoExterior:',)
+[SUBTABLA]
+   Atributos: ['Temperatura', 'Humedad', 'Viento', 'Jugar']
+   Ejemplos:  ['caluroso', 'alta', 'falso', 'no']
+              ['caluroso', 'alta', 'verdad', 'no']
+              ['templado', 'alta', 'falso', 'no']
+              ['frio', 'normal', 'falso', 'si']
+              ['templado', 'normal', 'verdad', 'si']
+[MERITOS]
+   Temperatura: 0.4 
+   Humedad: 0.0 
+   Viento: 0.9509775004326937 
+El mejor atributo es Humedad con mérito 0.0
+
+('Para el valor alta del atributo Humedad:',)
+[SUBTABLA]
+   Atributos: ['Temperatura', 'Viento', 'Jugar']
+   Ejemplos:  ['caluroso', 'falso', 'no']
+              ['caluroso', 'verdad', 'no']
+              ['templado', 'falso', 'no']
+[RESULTADO]: -
+('Para el valor normal del atributo Humedad:',)
+[SUBTABLA]
+   Atributos: ['Temperatura', 'Viento', 'Jugar']
+   Ejemplos:  ['frio', 'falso', 'si']
+              ['templado', 'verdad', 'si']
+[RESULTADO]: +
+('Para el valor nublado del atributo TiempoExterior:',)
+[SUBTABLA]
+   Atributos: ['Temperatura', 'Humedad', 'Viento', 'Jugar']
+   Ejemplos:  ['caluroso', 'alta', 'falso', 'si']
+              ['frio', 'normal', 'verdad', 'si']
+              ['templado', 'alta', 'verdad', 'si']
+              ['caluroso', 'normal', 'falso', 'si']
+[RESULTADO]: +
+('Para el valor lluvioso del atributo TiempoExterior:',)
+[SUBTABLA]
+   Atributos: ['Temperatura', 'Humedad', 'Viento', 'Jugar']
+   Ejemplos:  ['templado', 'alta', 'falso', 'si']
+              ['frio', 'normal', 'falso', 'si']
+              ['frio', 'normal', 'verdad', 'no']
+              ['templado', 'normal', 'falso', 'si']
+              ['templado', 'alta', 'verdad', 'no']
+[MERITOS]
+   Temperatura: 0.9509775004326937 
+   Humedad: 0.9509775004326937 
+   Viento: 0.0 
+El mejor atributo es Viento con mérito 0.0
+
+('Para el valor falso del atributo Viento:',)
+[SUBTABLA]
+   Atributos: ['Temperatura', 'Humedad', 'Jugar']
+   Ejemplos:  ['templado', 'alta', 'si']
+              ['frio', 'normal', 'si']
+              ['templado', 'normal', 'si']
+[RESULTADO]: +
+('Para el valor verdad del atributo Viento:',)
+[SUBTABLA]
+   Atributos: ['Temperatura', 'Humedad', 'Jugar']
+   Ejemplos:  ['frio', 'normal', 'no']
+              ['templado', 'alta', 'no']
+[RESULTADO]: -
