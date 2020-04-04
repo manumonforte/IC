@@ -328,9 +328,10 @@ def main():
                     log.removeHandler(hdlr)
                 log.addHandler(logging.FileHandler(filename, 'w'))   
 
+                print("*****Generando arbol*******\n\n[ARBOL]")
                 tree = generateTree(attribute_list,examples_list)
 
-                print("¿Desea predecir algun valor con el arbol creado?, si es así introduzca los valores separados por espacios")
+                print("\n¿Desea predecir algun valor con el arbol creado?, si es así introduzca los valores separados por espacios")
                 example  = input().split(" ")
                 print(example)
                 if len(attribute_list.get_list()) - 1 != len(example):
