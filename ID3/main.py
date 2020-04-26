@@ -151,13 +151,10 @@ def get_merit(example_list, N, attribute_index):
     merit = 0.00
     for i in range(0, len(frecuency)):
         if p[i] != 0 and n[i] != 0:
-            term_1 = (p[i] / frecuency_values[i]) * math.log(
-                (p[i] / frecuency_values[i]), 2
-            )
-            term_2 = (n[i] / frecuency_values[i]) * math.log(
-                (n[i] / frecuency_values[i]), 2
-            )
+            term_1 = (p[i]/frecuency_values[i]) * math.log((p[i]/frecuency_values[i]), 2)
+            term_2 = (n[i]/frecuency_values[i]) * math.log((n[i]/frecuency_values[i]), 2)
             merit = merit + (r[i] * (-term_1 - term_2))
+        
     return merit
 
 
@@ -300,8 +297,8 @@ def main():
         
         try:
             x = input("Introduza su eleccion:")
-            if int(x) < 0 or int(x) > 4: 
-                raise Exception("Opcion invalida, debe estar entre [0-4]")
+            if int(x) <= 0 or int(x) > 4: 
+                raise Exception("Opcion invalida, debe estar entre [1-4]")
             else:
                 attribute_list = AttributeList()
                 examples_list = ExamplesList()
