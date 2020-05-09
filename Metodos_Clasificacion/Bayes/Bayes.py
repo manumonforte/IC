@@ -102,23 +102,6 @@ class Label:
 
 if __name__ == "__main__":
     """ Ejemplo de ladiapositiva 13 """
-    print(">>>> Ejemplo diapositiva 13")
-    bayes = Bayes(3)
-    #######  EJEMPLO DIAPOSITIVA 13 ######
-    bayes.add_example([50, 250, 200], "RGB")
-    bayes.add_example([10, 254, 180], "RGB")
-    bayes.add_example([20, 240, 210], "RGB")
-    bayes.add_example([40, 248, 190], "RGB")
-    bayes.add_example([56, 254, 202], "RGB")
-    bayes.train()
-    print("Clase RGB")
-    print(">> M:\n")
-    print(bayes.get_class("RGB").get_m())
-    print(">> C:\n")
-    print(bayes.get_class("RGB").get_c())
-    print("[50,250,200] clasificado como clase ")
-    print(bayes.predict([50, 250, 200]))
-
     ######## IRIS #########
     # Leer datos
     data = load_data("Iris2Clases.txt")
@@ -134,19 +117,34 @@ if __name__ == "__main__":
             example[4],
         )
     bayes.train()
+    print("#" *50)
     print("Clase Iris setosa")
-    print(">> M:\n")
+    print("#" *50)
+    print("\n")
+    print("--> El vector M es <--")
     print(bayes.get_class("Iris-setosa").get_m())
-    print(">> C:\n")
+    print("\n")
+    print("--> La matiz C es <--:")
     print(bayes.get_class("Iris-setosa").get_c())
+    print("\n")
+    print("#" *50)
     print("Clase Iris versicolor")
-    print(">> M:\n")
+    print("#" *50)
+    print("\n")
+    print("--> El vector M es <--")
     print(bayes.get_class("Iris-versicolor").get_m())
-    print(">> C:\n")
+    print("\n")
+    print("--> La matiz C es <--:")
     print(bayes.get_class("Iris-versicolor").get_c())
+    print("\n")
+
+    print("#" *50)
+    print("CASOS DE PRUEBA")
+    print("#" *50)
+
     # TestIris01
-    print(bayes.predict([5.1, 3.5, 1.4, 0.2]))
-    # TestIris01
-    print(bayes.predict([6.9, 3.1, 4.9, 1.5]))
-    # TestIris01
-    print(bayes.predict([5.0, 3.4, 1.5, 0.2]))
+    print("Test-01: {}".format(bayes.predict([5.1, 3.5, 1.4, 0.2])))
+    # TestIris02
+    print("Test-02: {}".format(bayes.predict([6.9, 3.1, 4.9, 1.5])))
+    # TestIris03
+    print("Test-03: {}".format(bayes.predict([5.0, 3.4, 1.5, 0.2])))
