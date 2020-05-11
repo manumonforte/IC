@@ -1,6 +1,7 @@
 import numpy as np
 import sys
-
+import random
+import logging
 
 class KMeans():
     """Class to represent K-Means algorithim"""
@@ -39,16 +40,18 @@ class KMeans():
             for label in self.labels.keys():
                 delta = self.compute_v(self.labels[label],b)
                 higher_distance = delta > epsilon
-            print("Iteracion: {}".format(counter))
+            logging.info("#" * 50)
+            logging.info("[ ITERACION: {} ]".format(counter))
+            logging.info("#" * 50)
 
             for label in self.labels.keys():
-                print("Vector-{}".format(label))
-                print(self.labels[label].get_v_center())
+                logging.info("[ VECTOR-{} ]".format(label))
+                logging.info(self.labels[label].get_v_center())
 
             #Compute U
             self.update_U(b)
-            print("Matriz U")
-            print(np.transpose(self.U))
+            logging.info("[ MATRIZ U ]")
+            logging.info(np.transpose(self.U))
             counter+=1
 
     def compute_v(self,label,b):
@@ -59,7 +62,7 @@ class KMeans():
         for i in range(len(self.v_vectors)):
             #compute numerator
             numerator = self.U[i][label.get_index()]
-            new_numerator= np.add(new_numerator, np.dot(np.power(numerator,b),self.v_vectors[i]))
+            new_numerator= np.add(new_numerator, np.dot(np.power(numerator,b), self.v_vectors[i]))
             #compute denominator
             denominator = self.U[i][label.get_index()]
             new_denominator = np.add(new_denominator,np.power(denominator,b))
@@ -98,14 +101,14 @@ class KMeans():
         label_predicted= None
         min = float('inf')
 
-        print ("Clasificacion de distancia vector {} ".format(example))
+        print ("Muestra: {} ".format(example))
         for label in self.labels.keys():
             distance = self.calculate_distance(self.labels[label].get_v_center(),example)
             print ("Distancia a la clase {} : {}".format(self.labels[label].get_label_name(),distance))
             if(distance < min):
                 min = distance
                 label_predicted = label
-        return label_predicted
+        return "Clasificacion: " + label_predicted
     
     def get_probabilities_of_new_example(self,example,b):
         """Get all labels probabilities from the example given"""
@@ -140,39 +143,59 @@ class Label():
     def get_index(self):
         return self.index
 
+def generate_random_U(num_vectors,num_labels):
 
+    matrix = []
+    for i in range(num_vectors):
+        elem = random.uniform(0, 1)
+        matrix.append(elem)
+        matrix.append(1-elem)
+    return np.reshape(matrix,(num_vectors,num_labels))
 
 if __name__=="__main__":
-    print("Ejemplo Diap 8")
 
-    clase_1= Label(0,"Clase 1")
-    clase_2 = Label(1,"Clase 2")
-    clase_1.set_v_center([6.70,3.43])
-    clase_2.set_v_center([2.39,2.94])
+    filename="../logs/Kmeans.log"
+    logging.basicConfig(filename=filename, filemode='w',format='%(asctime)s - %(message)s', level=logging.INFO)
+    log = logging.getLogger()  # root logger
+    for hdlr in log.handlers[:]:  # remove all old handlers
+        log.removeHandler(hdlr)
+    log.addHandler(logging.FileHandler(filename, 'w'))   
 
-    kmedias = KMeans(2)
+    
+    print("Ejemplo Iris")
 
-    matrix = [0.022,0.978,0.003,0.997,0.03,0.97,0.002,0.998,0.0,1.0,0.997,0.003,0.997,0.003,0.946,0.054,1.0,0.0,0.990,0.01]
-    matrix = np.reshape(matrix,(10,2))
-    kmedias.set_U(matrix)
+    clase_1= Label(0,"Iris Setosa")
+    clase_2 = Label(1,"Iris Versicolor")
+    clase_1.set_v_center([4.6,3.0,4.0,0.0])
+    clase_2.set_v_center([6.8,3.4,4.6,0.7])
+
+    kmedias = KMeans(4)
 
     kmedias.add_label(clase_1)
     kmedias.add_label(clase_2)
 
-    kmedias.add_vector([1,1])
-    kmedias.add_vector([1,3])
-    kmedias.add_vector([1,5])
-    kmedias.add_vector([2,2])
-    kmedias.add_vector([2,3])
-    kmedias.add_vector([6,3])
-    kmedias.add_vector([6,4])
-    kmedias.add_vector([7,1])
-    kmedias.add_vector([7,3])
-    kmedias.add_vector([7,5])
+    #read file 
+    f = open("../data/Iris2Clases.txt","r")
+    lines = f.readlines()
+    f.close()
 
-    kmedias.train(epsilon=0.02,b=2)
+    #create U
+    matrix = generate_random_U(len(lines),2)
+    kmedias.set_U(matrix)
 
-    print (kmedias.get_distances_from_new_example([2,3]))
-    print (kmedias.get_probabilities_of_new_example([2,3],b=2))
+    #add vectors
+    for line in lines:
+        new_vector = line.strip("\n").split(",")
+        new_vector = list(map(float, new_vector[:-1]))
+        kmedias.add_vector(new_vector)
 
-    #######################################################################
+    kmedias.train(epsilon=0.01,b=2)
+
+    print("-" *50)
+    print(kmedias.get_distances_from_new_example([5.1,3.5,1.4,0.2]))
+
+    print("-" *50)
+    print(kmedias.get_distances_from_new_example([6.9,3.1,4.9,1.5]))
+
+    print("-" *50)
+    print(kmedias.get_distances_from_new_example([5.1,3.5,1.4,0.2]))

@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import math
+import logging
 
 
 def load_data(file_name):
@@ -39,13 +40,15 @@ class Bayes:
         """get the lowest cost of all label for this example"""
         output = ""
         best = math.inf
+        print ("Muestra: {} ".format(example))
         for label in self.labels:
             diff = np.transpose(example) - self.labels[label].get_m()
             dm = np.dot(np.dot(diff, np.linalg.inv(self.labels[label].get_c())), diff)
+            print ("Distancia a la clase {} : {}".format(label,dm))
             if best > dm:
                 best = dm
                 output = label
-        return output
+        return "Clasificacion: " + output
 
     def get_class(self, label):
         return self.labels[label]
@@ -101,6 +104,14 @@ class Label:
 
 
 if __name__ == "__main__":
+    
+    filename="../logs/Bayes.log"
+    logging.basicConfig(filename=filename, filemode='w',format='%(asctime)s - %(message)s', level=logging.INFO)
+    log = logging.getLogger()  # root logger
+    for hdlr in log.handlers[:]:  # remove all old handlers
+        log.removeHandler(hdlr)
+    log.addHandler(logging.FileHandler(filename, 'w'))   
+    
     """ Ejemplo de ladiapositiva 13 """
     ######## IRIS #########
     # Leer datos
@@ -117,34 +128,38 @@ if __name__ == "__main__":
             example[4],
         )
     bayes.train()
-    print("#" *50)
-    print("Clase Iris setosa")
-    print("#" *50)
-    print("\n")
-    print("--> El vector M es <--")
-    print(bayes.get_class("Iris-setosa").get_m())
-    print("\n")
-    print("--> La matiz C es <--:")
-    print(bayes.get_class("Iris-setosa").get_c())
-    print("\n")
-    print("#" *50)
-    print("Clase Iris versicolor")
-    print("#" *50)
-    print("\n")
-    print("--> El vector M es <--")
-    print(bayes.get_class("Iris-versicolor").get_m())
-    print("\n")
-    print("--> La matiz C es <--:")
-    print(bayes.get_class("Iris-versicolor").get_c())
-    print("\n")
+    logging.info("#" *50)
+    logging.info("[CLASE IRIS SETOSA]")
+    logging.info("#" *50)
+    logging.info("\n")
+    logging.info("[VECTOR M]")
+    logging.info(bayes.get_class("Iris-setosa").get_m())
+    logging.info("\n")
+    logging.info("[MATRIZ C]")
+    logging.info(bayes.get_class("Iris-setosa").get_c())
+    logging.info("\n")
+    logging.info("#" *50)
+    logging.info("[CLASE IRIS VERSICOLOR]")
+    logging.info("#" *50)
+    logging.info("\n")
+    logging.info("[VECTOR M]")
+    logging.info(bayes.get_class("Iris-versicolor").get_m())
+    logging.info("\n")
+    logging.info("[MATRIZ C]")
+    logging.info(bayes.get_class("Iris-versicolor").get_c())
+    logging.info("\n")
 
-    print("#" *50)
+
+    print("-" *50)
     print("CASOS DE PRUEBA")
-    print("#" *50)
+    print("-" *50)
 
     # TestIris01
     print("Test-01: {}".format(bayes.predict([5.1, 3.5, 1.4, 0.2])))
     # TestIris02
+    print("-" *50)
     print("Test-02: {}".format(bayes.predict([6.9, 3.1, 4.9, 1.5])))
     # TestIris03
+    print("-" *50)
     print("Test-03: {}".format(bayes.predict([5.0, 3.4, 1.5, 0.2])))
+
