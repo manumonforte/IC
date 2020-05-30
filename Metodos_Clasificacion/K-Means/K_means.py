@@ -161,8 +161,10 @@ if __name__=="__main__":
         log.removeHandler(hdlr)
     log.addHandler(logging.FileHandler(filename, 'w'))   
 
-    
-    print("Ejemplo Iris")
+
+    print("-" *50)
+    print("CASOS DE PRUEBA")
+    print("-" *50)
 
     clase_1= Label(0,"Iris Setosa")
     clase_2 = Label(1,"Iris Versicolor")
@@ -191,11 +193,10 @@ if __name__=="__main__":
 
     kmedias.train(epsilon=0.01,b=2)
 
-    print("-" *50)
     print(kmedias.get_distances_from_new_example([5.1,3.5,1.4,0.2]))
-
     print("-" *50)
+
     print(kmedias.get_distances_from_new_example([6.9,3.1,4.9,1.5]))
-
     print("-" *50)
+
     print(kmedias.get_distances_from_new_example([5.1,3.5,1.4,0.2]))

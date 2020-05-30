@@ -139,7 +139,7 @@ if __name__ == "__main__":
     logging.info(bayes.get_class("Iris-setosa").get_c())
     logging.info("\n")
     logging.info("#" *50)
-    logging.info("[CLASE IRIS VERSICOLOR]")
+    logging.info("[CLASE IRIS VERperiodSICOLOR]")
     logging.info("#" *50)
     logging.info("\n")
     logging.info("[VECTOR M]")
